@@ -1,0 +1,37 @@
+{
+  "name": "retryable",
+  "version": "1.0.0",
+  "description": "Async retry wrapper",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "npm test -- --watch",
+    "lint": "eslint src test",
+    "clean": "rimraf lib",
+    "build": "npm run clean && babel src -d lib"
+  },
+  "keywords": [
+    "retry",
+    "async"
+  ],
+  "authors": [
+    "Jesse Bibee <jesse.bibee@gmail.com> (https://github.com/jessebibee)"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/runtime": "^7.4.5",
+    "babel-jest": "^24.8.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.13.0",
+    "jest": "^24.8.0",
+    "rimraf": "^2.6.3"
+  }
+}
