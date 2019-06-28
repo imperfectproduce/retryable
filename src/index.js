@@ -2,13 +2,26 @@ const noop = () => {};
 const all = () => true;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const maybeSleep = async (error, attempt, delayMs) => {
+/**
+ * Switches on the different inputs of delayMs to form a normalized function,
+ * doing the type check upfront and avoiding on each retry.
+ *
+ * @param {any} delayMs
+ * @return {function}
+ */
+const makeDelayFn = (delayMs) => {
   if (Number.isFinite(delayMs)) {
-    await sleep(delayMs);
-  } else if (typeof delayMs === 'function') {
-    const ms = delayMs(error, attempt);
-    await sleep(ms);
+    return async () => sleep(delayMs);
   }
+
+  if (typeof delayMs === 'function') {
+    return async (error, attempt) => {
+      const ms = delayMs(error, attempt);
+      return sleep(ms);
+    };
+  }
+
+  return noop;
 };
 
 export default (fn, options = {}) => {
@@ -19,6 +32,9 @@ export default (fn, options = {}) => {
     delayMs = null // number (ms) or function returning a number (ms)
   } = options;
 
+  const maybeSleep = makeDelayFn(delayMs);
+  const customRetryLogic = retryOn !== all;
+
   return async (...args) => {
     let attempt = 1;
 
@@ -26,19 +42,17 @@ export default (fn, options = {}) => {
       try {
         const result = await fn(...args);
 
-        // Only run the retry logic if it is explicitly provided
-        // a result that is not an exception, but needing retry, is considered an error
-        if (retryOn !== all && retryOn(result, attempt)) {
-          if (attempt === maxRetries) {
-            // this will pass through the catch below, calling onError, and getting re-thrown
-            throw result;
-          } else {
-            // log the error
-            onError(result, attempt);
-          }
+        // a result that is not an exception can still be considered an error and need retrying.
+        // only run retry logic if it's custom, otherwise this is a success result by default.
+        if (customRetryLogic && retryOn(result, attempt)) {
+          // throwing will pass through the catch below, calling onError, and getting re-thrown.
+          if (attempt === maxRetries) throw result;
 
-          // sleep, increment attempts, and retry
-          await maybeSleep(result, attempt, delayMs);
+          // considered an error if retrying
+          onError(result, attempt);
+
+          // delay and retry
+          await maybeSleep(result, attempt);
           attempt += 1;
         } else {
           return result;
@@ -46,12 +60,12 @@ export default (fn, options = {}) => {
       } catch (error) {
         onError(error, attempt);
 
-        // throw original error (and final attempt one) if exiting
-        // only run retry function if there are retries remaining
+        // throw original error (and one from the final attempt) if exiting.
+        // only run retry function if there are retries remaining.
         if ((attempt === maxRetries) || !retryOn(error, attempt)) throw error;
 
-        // sleep, increment attempts, and retry
-        await maybeSleep(error, attempt, delayMs);
+        // delay and retry
+        await maybeSleep(error, attempt);
         attempt += 1;
       }
     }
