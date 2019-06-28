@@ -6,8 +6,8 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
  * Switches on the different inputs of delayMs to form a normalized function,
  * doing the type check upfront and avoiding on each retry.
  *
- * @param {any} delayMs
- * @return {function}
+ * @param {number|function|null} delayMss
+ * @returns {function}
  */
 const makeDelayFn = (delayMs) => {
   if (Number.isFinite(delayMs)) {
@@ -28,8 +28,8 @@ const makeDelayFn = (delayMs) => {
  * Switches on the different inputs of retryOn to form a normalized function,
  * doing the type check upfront and avoiding on each retry.
  *
- * @param {any} retryOn
- * @return {function}
+ * @param {function|array} retryOn
+ * @returns {function}
  */
 const makeShouldRetryFn = (retryOn) => {
   if (Array.isArray(retryOn)) {
@@ -40,6 +40,12 @@ const makeShouldRetryFn = (retryOn) => {
   return (result, attempt) => retryOn(result, attempt);
 };
 
+/**
+ * Retry wrapper.
+ * @param {function} fn The function to wrap with retry logic.
+ * @param {object} options Optional retry configuration options.
+ * @returns {function}
+ */
 export default (fn, options = {}) => {
   const {
     maxRetries = 3,
