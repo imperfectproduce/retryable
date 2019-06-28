@@ -194,4 +194,25 @@ describe('asRetryable', () => {
       expect(ellapsed).toBeGreaterThanOrEqual(delayMs * sleeps);
     }
   });
+
+  it('retries when only one matching retryOn option is provided', async () => {
+    let invocationCount = 0;
+    const testFn = () => {
+      invocationCount += 1;
+      return Promise.resolve({ ok: false, status: 502 });
+    };
+    const options = {
+      maxRetries: 2,
+      retryOn: [
+        response => response.status === 429,
+        response => response.status === 502
+      ]
+    };
+
+    try {
+      await asRetryable(testFn, options)();
+    } catch (ex) {
+      expect(invocationCount).toEqual(options.maxRetries);
+    }
+  });
 });
