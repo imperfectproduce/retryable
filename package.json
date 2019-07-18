@@ -1,21 +1,31 @@
 {
-  "name": "retryable",
+  "name": "@imperfectproduce/retryable",
   "version": "1.0.0",
-  "description": "Async retry wrapper",
+  "description": "Flexible and configuable retry wrapper for all promise/async functions",
+  "repository": "github:imperfectproduce/retryable",
+  "bugs": "https://github.com/imperfectproduce/retryable/issues",
   "main": "lib/index.js",
   "scripts": {
     "test": "jest",
     "test:watch": "npm test -- --watch",
     "lint": "eslint src test",
     "clean": "rimraf lib",
-    "build": "npm run clean && babel src -d lib"
+    "build": "npm run clean && babel src -d lib",
+    "prepare": "npm run build"
   },
   "keywords": [
     "retry",
-    "async"
+    "retryable",
+    "async",
+    "promise",
+    "bluebird"
   ],
   "authors": [
     "Jesse Bibee <jesse.bibee@gmail.com> (https://github.com/jessebibee)"
+  ],
+  "files": [
+    "lib",
+    "src"
   ],
   "license": "MIT",
   "devDependencies": {
