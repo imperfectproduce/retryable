@@ -40,6 +40,7 @@ const makeShouldRetryFn = (retryOn) => {
   return (result, attempt) => retryOn(result, attempt);
 };
 
+/* eslint-disable consistent-return */
 /**
  * Retry wrapper.
  * @param {function} fn The function to wrap with retry logic.
@@ -61,6 +62,7 @@ export default (fn, options = {}) => {
   return async (...args) => {
     let attempt = 1;
 
+    /* eslint-disable no-await-in-loop */
     while (attempt <= maxRetries) {
       try {
         const result = await fn(...args);
@@ -92,5 +94,7 @@ export default (fn, options = {}) => {
         attempt += 1;
       }
     }
+    /* eslint-enable no-await-in-loop */
   };
 };
+/* eslint-disable consistent-return */
