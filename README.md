@@ -102,6 +102,26 @@ export const getProductsWithRetry = retryable(getProducts, {
 
 #### Use Cases
 
+###### Wrapping All Fetch Calls
+
+Rather than wrapping individual functions, a common one can be wrapped as well.
+The third argument `args` passed to all options functions becomes useful to interact with
+call specific arguments.
+
+```js
+import fetch from 'isomorphic-fetch';
+
+export const retryableFetch = retryable(fetch, {
+  maxRetries: 3,
+  retryOn: networkErrors,
+  delayMs: 1000,
+  onError: (error, attempt, args) => {
+    const [url, options] = args;
+    logger.error(error, attempt, url, options.method);
+  }
+});
+```
+
 ###### Rate Limiting Retries
 
 Some API's (eg [Asana]("https://asana.com/developers/documentation/getting-started/rate-limits")) provide the time to wait to honor rate limiting.
