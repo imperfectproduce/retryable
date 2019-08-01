@@ -6,7 +6,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
  * Switches on the different inputs of delayMs to form a normalized function,
  * doing the type check upfront and avoiding on each retry.
  *
- * @param {number|function|null} delayMss
+ * @param {number|function|null} delayMs
  * @returns {function}
  */
 const makeDelayFn = (delayMs) => {
@@ -15,8 +15,8 @@ const makeDelayFn = (delayMs) => {
   }
 
   if (typeof delayMs === 'function') {
-    return async (error, attempt) => {
-      const ms = delayMs(error, attempt);
+    return async (error, attempt, args) => {
+      const ms = delayMs(error, attempt, args);
       return sleep(ms);
     };
   }
@@ -33,11 +33,11 @@ const makeDelayFn = (delayMs) => {
  */
 const makeShouldRetryFn = (retryOn) => {
   if (Array.isArray(retryOn)) {
-    return (result, attempt) => retryOn.some(fn => fn(result, attempt));
+    return (result, attempt, args) => retryOn.some(fn => fn(result, attempt, args));
   }
 
   // else assume function
-  return (result, attempt) => retryOn(result, attempt);
+  return retryOn;
 };
 
 /* eslint-disable consistent-return */
@@ -69,28 +69,28 @@ export default (fn, options = {}) => {
 
         // a result that is not an exception can still be considered an error and need retrying.
         // only run retry logic if it's custom, otherwise this is a success result by default.
-        if (customRetryLogic && retry(result, attempt)) {
+        if (customRetryLogic && retry(result, attempt, args)) {
           // throwing will pass through the catch below, calling onError, and getting re-thrown.
           if (attempt === maxRetries) throw result;
 
           // considered an error if retrying
-          onError(result, attempt);
+          onError(result, attempt, args);
 
           // delay and retry
-          await maybeSleep(result, attempt);
+          await maybeSleep(result, attempt, args);
           attempt += 1;
         } else {
           return result;
         }
       } catch (error) {
-        onError(error, attempt);
+        onError(error, attempt, args);
 
         // throw original error (and one from the final attempt) if exiting.
         // only run retry function if there are retries remaining.
-        if ((attempt === maxRetries) || !retry(error, attempt)) throw error;
+        if ((attempt === maxRetries) || !retry(error, attempt, args)) throw error;
 
         // delay and retry
-        await maybeSleep(error, attempt);
+        await maybeSleep(error, attempt, args);
         attempt += 1;
       }
     }

@@ -57,15 +57,15 @@ No matter the retry logic provided, will not retry greater than max.
 *Type*: `function`|`array`
 
 ```js
-(error: any, attempt: number) => boolean;
-[(error: any, attempt: number) => boolean];
+(error: any, attempt: number, args: any[]) => boolean;
+[(error: any, attempt: number, args: any[]) => boolean];
 ```
 
 Function or array of functions describing different scenarios to retry on.
 If provided, function(s) are invoked every time, whether or not the original function resolves
 successfully.  This is because some APIs (eg Fetch API) may not throw an error
 or return a rejected promise in scenarios considered an error.  If an array of
-functions is provided, only one case has to return `true` to retry.
+functions is provided, only one has to return `true` to retry.
 
 ### delayMs
 
@@ -73,7 +73,7 @@ functions is provided, only one case has to return `true` to retry.
 
 ```js
 500
-(error: any, attempt: number) => number;
+(error: any, attempt: number, args: any[]) => number;
 ```
 
 Provide a static number of milliseconds to wait, or implement custom logic based
@@ -84,7 +84,7 @@ on the error and attempt number.  A backoff algorithm can be supplied here.
 *Type*: `function`
 
 ```js
-(error: any, attempt: number) => {};
+(error: any, attempt: number, args: any[]) => {};
 ```
 
 Hook into errors for logging or similar purposes.  Note that this callback function will be invoked if the wrapped function should be retried (see `retryOn`), even if it executed without an error.
@@ -109,8 +109,8 @@ Some API's (eg [Asana]("https://asana.com/developers/documentation/getting-start
 ```js
 export const getProductsWithRetry = retryable(getProducts, {
   maxRetries: 3,
-  retryOn: (response) => response.status === 429 && response.headers['Retry-After'] <= 5, // Too Many Requests
-  delayMs: (error, attempt) => response.headers['Retry-After'] * 1000,
+  retryOn: (response) => response.status === 429 && response.headers['Retry-After'] <= 5,
+  delayMs: (error, attempt) => error.headers['Retry-After'] * 1000,
   onError: (error, attempt) => logger.error(error, attempt)
 });
 ```

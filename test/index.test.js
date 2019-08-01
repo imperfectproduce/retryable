@@ -215,4 +215,36 @@ describe('asRetryable', () => {
       expect(invocationCount).toEqual(options.maxRetries);
     }
   });
+
+  it('invokes callback functions with args as third parameter', async () => {
+    const testFn = () => { throw new Error('error'); };
+    let onErrorInvocationArgs = null;
+    let retryInvocationArgs = null;
+    let delayInvocationArgs = null;
+    const options = {
+      maxRetries: 2,
+      onError: (error, attempt, args) => { onErrorInvocationArgs = args; },
+      retryOn: (error, attempt, args) => { retryInvocationArgs = args; return true; },
+      delayMs: (error, attempt, args) => { delayInvocationArgs = args; return 0; },
+    };
+    const url = 'url';
+    const obj = { method: 'GET' };
+
+    try {
+      await asRetryable(testFn, options)(url, obj);
+    } catch (ex) {
+      expect(Array.isArray(onErrorInvocationArgs)).toEqual(true);
+      expect(onErrorInvocationArgs.length).toEqual(2);
+      expect(onErrorInvocationArgs[0]).toEqual(url);
+      expect(onErrorInvocationArgs[1]).toEqual(obj);
+      expect(Array.isArray(retryInvocationArgs)).toEqual(true);
+      expect(retryInvocationArgs.length).toEqual(2);
+      expect(retryInvocationArgs[0]).toEqual(url);
+      expect(retryInvocationArgs[1]).toEqual(obj);
+      expect(Array.isArray(delayInvocationArgs)).toEqual(true);
+      expect(delayInvocationArgs.length).toEqual(2);
+      expect(delayInvocationArgs[0]).toEqual(url);
+      expect(delayInvocationArgs[1]).toEqual(obj);
+    }
+  });
 });
