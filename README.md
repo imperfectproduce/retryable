@@ -16,13 +16,14 @@ $ yarn add @imperfectproduce/retryable
 ```js
 import fetch from 'isomorphic-fetch';
 import retryable from '@imperfectproduce/retryable';
+import { randomBetween } from '@imperfectproduce/retryable/delay';
 
 const getProduct = async (id) => await fetch(`/products/${id}`);
 
 const getProductWithRetry = retryable(getProduct, {
   maxRetries: 3,
   retryOn: (response) => response.status === 503, // Service Unavailable
-  delayMs: 500
+  delayMs: randomBetween(500, 1000)
 });
 
 const response = await getProductWithRetry(123);
@@ -77,7 +78,7 @@ functions is provided, only one has to return `true` to retry.
 ```
 
 Provide a static number of milliseconds to wait, or implement custom logic based
-on the error and attempt number.  A backoff algorithm can be supplied here.
+on the error and attempt number.  A backoff algorithm can be supplied here (see below).
 
 ### onError
 
@@ -88,6 +89,22 @@ on the error and attempt number.  A backoff algorithm can be supplied here.
 ```
 
 Hook into errors for logging or similar purposes.  Note that this callback function will be invoked if the wrapped function should be retried (see `retryOn`), even if it executed without an error.
+
+## Random/Backoff Algorithms
+
+It's common to add randomness or exponential backoff in the retry wait time to spread out the time
+competing clients might retry.  See this
+[AWS article]("https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/").
+
+###### randomBetween
+
+```js
+import { randomBetween } from '@imperfectproduce/retryable/delay';
+
+const getProductWithRetry = retryable(getProduct, {
+  delayMs: randomBetween(1000, 2000) // random time between 1 and 2 seconds
+});
+```
 
 #### Utilities for Common Retry Logic
 
