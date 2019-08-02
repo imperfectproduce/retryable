@@ -94,7 +94,7 @@ Hook into errors for logging or similar purposes.  Note that this callback funct
 
 It's common to add randomness or exponential backoff in the retry wait time to spread out the time
 competing clients might retry.  See this
-[AWS article]("https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/").
+[AWS article](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter).
 
 ###### randomBetween
 
@@ -141,7 +141,7 @@ export const retryableFetch = retryable(fetch, {
 
 ###### Rate Limiting Retries
 
-Some API's (eg [Asana]("https://asana.com/developers/documentation/getting-started/rate-limits")) provide the time to wait to honor rate limiting.
+Some API's (eg [Asana](https://asana.com/developers/documentation/getting-started/rate-limits)) provide the time to wait to honor rate limiting.
 
 ```js
 export const getProductsWithRetry = retryable(getProducts, {
