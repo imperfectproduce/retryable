@@ -47,7 +47,7 @@ const makeShouldRetryFn = (retryOn) => {
  * @param {object} options Optional retry configuration options.
  * @returns {function}
  */
-export default (fn, options = {}) => {
+const retryable = (fn, options = {}) => {
   const {
     maxRetries = 3,
     onError = noop, // notification hook on each error
@@ -98,3 +98,7 @@ export default (fn, options = {}) => {
   };
 };
 /* eslint-disable consistent-return */
+
+export * from './delay';
+export * from './fetchErrors';
+export default retryable;

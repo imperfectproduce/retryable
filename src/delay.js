@@ -1,4 +1,5 @@
 /* Algorithms to apply as the delayMs option to add randomness and/or backoff to retries */
+/* eslint-disable import/prefer-default-export */
 
 /**
  * @param {number} min The minimum number of milliseconds.

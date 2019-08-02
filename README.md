@@ -15,8 +15,7 @@ $ yarn add @imperfectproduce/retryable
 
 ```js
 import fetch from 'isomorphic-fetch';
-import retryable from '@imperfectproduce/retryable';
-import { randomBetween } from '@imperfectproduce/retryable/delay';
+import retryable, { randomBetween } from '@imperfectproduce/retryable';
 
 const getProduct = async (id) => await fetch(`/products/${id}`);
 
@@ -90,7 +89,7 @@ on the error and attempt number.  A backoff algorithm can be supplied here (see 
 
 Hook into errors for logging or similar purposes.  Note that this callback function will be invoked if the wrapped function should be retried (see `retryOn`), even if it executed without an error.
 
-## Random/Backoff Algorithms
+## Random/Backoff Delay Algorithms
 
 It's common to add randomness or exponential backoff in the retry wait time to spread out the time
 competing clients might retry.  See this
@@ -99,7 +98,7 @@ competing clients might retry.  See this
 ###### randomBetween
 
 ```js
-import { randomBetween } from '@imperfectproduce/retryable/delay';
+import retryable, { randomBetween } from '@imperfectproduce/retryable';
 
 const getProductWithRetry = retryable(getProduct, {
   delayMs: randomBetween(1000, 2000) // random time between 1 and 2 seconds
@@ -109,8 +108,7 @@ const getProductWithRetry = retryable(getProduct, {
 #### Utilities for Common Retry Logic
 
 ```js
-import retryable from '@imperfectproduce/retryable';
-import { networkErrors, rateLimitingError } from '@imperfectproduce/retryable/fetchErrors';
+import retryable, { networkErrors, rateLimitingError } from '@imperfectproduce/retryable';
 
 export const getProductsWithRetry = retryable(getProducts, {
   retryOn: [networkErrors, rateLimitingError]
