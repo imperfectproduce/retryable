@@ -10,8 +10,7 @@
     "test:watch": "npm test -- --watch",
     "lint": "eslint src test",
     "clean": "rimraf lib",
-    "build": "npm run clean && babel src -d lib",
-    "prepare": "npm run build"
+    "build": "npm run clean && babel src -d lib"
   },
   "keywords": [
     "retry",
