@@ -1,6 +1,6 @@
 {
   "name": "@imperfectproduce/retryable",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Flexible and configurable retry wrapper for all promise/async functions",
   "repository": "github:imperfectproduce/retryable",
   "bugs": "https://github.com/imperfectproduce/retryable/issues",
