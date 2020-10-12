@@ -30,6 +30,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Authenticate with Github Packages
+          command: echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run:
           name: Publish package
           command: npm publish
 
